@@ -1,4 +1,4 @@
-package com.example.fastfood;
+package com.example.fastfood.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

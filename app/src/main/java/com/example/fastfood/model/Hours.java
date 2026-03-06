@@ -1,4 +1,4 @@
-package com.example.fastfood;
+package com.example.fastfood.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

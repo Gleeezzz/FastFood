@@ -14,7 +14,7 @@
         android:theme="@style/Theme.FastFood">
 
         <activity
-            android:name=".SplashActivity"
+            android:name="com.example.fastfood.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.FastFood">
             <intent-filter>
@@ -25,10 +25,29 @@
 
         <!-- Ajout MainActivity -->
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.fastfood.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:theme="@style/Theme.FastFood" />
+        <activity
+            android:name="com.example.fastfood.OrderSucceessActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:theme="@style/Theme.FastFood" />
+
+        <activity
+            android:name="com.example.fastfood.PlaceYourOrderActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:theme="@style/Theme.FastFood" />
+
+        <activity
+            android:name="com.example.fastfood.RestaurantMenuActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:theme="@style/Theme.FastFood" />
+
+
 
     </application>
 

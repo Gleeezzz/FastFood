@@ -1,18 +1,25 @@
 package com.example.fastfood;
 
-import android.os.Bundle;
+import com.example.fastfood.model.Restaurant;
 
+import android.content.Intent;
+import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.fastfood.adapters.RestaurantListAdapter;
+import com.google.gson.Gson;
+import java.io.BufferedReader;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-
-    private List<Restaurant> restaurants = new ArrayList<>();
+public class MainActivity extends AppCompatActivity implements RestaurantListAdapter.OnRestaurantClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,57 +27,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Restaurant List");
-
-        loadRestaurants();
+        // get restaurant list from json
+        List<Restaurant> restaurantList = getRestaurantData();
+        initRecyclerView(restaurantList);
     }
 
-    private List<Restaurant> loadRestaurants() {
+    private void initRecyclerView(List<Restaurant> restaurantList) {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        RestaurantListAdapter adapter = new RestaurantListAdapter(restaurantList, this);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private List<Restaurant> getRestaurantData() {
+        InputStream is = getResources().openRawResource(R.raw.restaurant);
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
         try {
-            InputStream is = getResources().openRawResource(R.raw.restaurant);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            String json = new String(buffer, "UTF-8");
-
-            JSONArray array = new JSONArray(json);
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                Restaurant r = new Restaurant();
-                r.setName(obj.getString("name"));
-                r.setAddress(obj.getString("address"));
-                r.setDelivery_charge((float) obj.getDouble("delivery_charge"));
-                r.setImage(obj.getString("image"));
-
-                // Hours
-                JSONObject hoursObj = obj.getJSONObject("hours");
-                Hours h = new Hours();
-                h.setSunday(hoursObj.getString("Sunday"));
-                h.setMonday(hoursObj.getString("Monday"));
-                h.setTuesday(hoursObj.getString("Tuesday"));
-                h.setWednesday(hoursObj.getString("Wednesday"));
-                h.setThursday(hoursObj.getString("Thursday"));
-                h.setFriday(hoursObj.getString("Friday"));
-                h.setSaturday(hoursObj.getString("Saturday"));
-                r.setHours(h);
-
-                // Menus
-                r.setMenus(new ArrayList<>());
-                JSONArray menus = obj.getJSONArray("menus");
-                for (int j = 0; j < menus.length(); j++) {
-                    JSONObject m = menus.getJSONObject(j);
-                    Menu item = new Menu();
-                    item.setName(m.getString("name"));
-                    item.setPrice((float) m.getDouble("price"));
-                    item.setUrl(m.getString("url"));
-                    r.getMenus().add(item);
-                }
-                restaurants.add(r);
-                android.util.Log.d("Restaurant", r.getName() + " - " + r.getAddress());
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return restaurants;
+        String jsonStr = writer.toString();
+        Gson gson = new Gson();
+        Restaurant[] restaurants = gson.fromJson(jsonStr, Restaurant[].class);
+        return Arrays.asList(restaurants);
+    }
+
+    @Override
+    public void onRestaurantClick(Restaurant restaurant) {
+        // Navigation vers le détail - à implémenter plus tard
+        Intent intent = new Intent(MainActivity.this, RestaurantMenuActivity.class);
+        intent.putExtra("restaurant", restaurant);
+        startActivity(intent);
     }
 }
